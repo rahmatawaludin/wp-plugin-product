@@ -13,8 +13,10 @@ jQuery(document).ready(function($) {
 		};		
 
 		jQuery.post(categoryAjax.ajaxurl, data, function(response) {
-			console.log(response);
-			$(response).insertAfter($('#'+form_id));
+			// console.log(response);
+			$('#'+form_id).nextAll("[id^=selectcat]").remove();
+			$('#'+form_id).nextAll("[id=content_product]").remove();
+			$(''+response+'').insertAfter($('#'+form_id));
 		});
 	});
 });

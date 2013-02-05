@@ -76,19 +76,6 @@ function product_display() {
 		);
 	echo wp_dropdown_categories($criteria);
 
-	/* debug */
-
-	/* $criteria = array(
-		'child_of' => 0,
-		'hide_empty' => 0,
-		'hierarchical' => true,
-		'exclude' => 1);
-
-	$categories = get_categories( $criteria );
-	foreach ($categories as $category) {
-		$htmlOut .= $category->cat_name . " $category->term_id $category->parent <br/> " ;
-	}
-	return $htmlOut; */
 }
 
 function print_r_html ($arr) {
@@ -97,7 +84,7 @@ function print_r_html ($arr) {
         ?></pre><?php
 }
 
-/* Buat Call ajax get_category yang mengarah ke fungsi get_category */
+/* Buat Call ajax product_get_category yang mengarah ke fungsi get_category */
 add_action('wp_ajax_product_get_category', 'product_get_category'); // akses ajax oleh user yang sudah login
 add_action('wp_ajax_nopriv_product_get_category', 'product_get_category'); // akses ajax oleh user yang belum login
 
@@ -107,7 +94,7 @@ function product_get_category() {
 	$form_name = 'selectcat'.$cat_id;
 	
 	if (category_has_children($cat_id)) {
-		$criteria = array(
+		$cat_criteria = array(
 			'parent' => $cat_id, // HANYA direct child dari category 0 (top parent)
 			'hide_empty' => 0, // Tampilkan category walaupun post nya kosong
 			// 'hierarchical' => true, // Tree
@@ -116,15 +103,28 @@ function product_get_category() {
 			'show_option_none' => __('None'),
 			'name' => $form_name // nama dari form
 		);
-		echo wp_dropdown_categories($criteria); // kirim select berdasarkan id category yang dikirim
+		echo wp_dropdown_categories($cat_criteria); // kirim select berdasarkan id category yang dikirim
 	} else {
-		echo "category tidak memiliki child";
+		$post_criteria = array(
+			'cat' => $cat_id,
+			'post_type' => 'product'
+			);
+
+		$posts = query_posts( $post_criteria );
+		if ($posts) {
+			echo '<div id="content_product">';
+			foreach ($posts as $post) {
+				echo "<a href='$post->guid'>$post->post_title</a> <br>";
+			}
+			echo '</div>';
+		}
+		
 	}
 
 	die(); // this is required to return a proper result
 }
 
-// check apakah category punya children
+// fungsi utk check apakah category punya children
 function category_has_children($cat_id) {
 	global $wpdb;
 	$category_children_check = $wpdb->get_results(" SELECT * FROM wp_term_taxonomy WHERE parent = '$cat_id' ");
