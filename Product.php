@@ -67,11 +67,10 @@ add_shortcode( 'prd', 'product_display' );
  * callback for shortcode [prd]
  */
 function product_display() {
-	wp_enqueue_script( 'jquery' );
-	wp_enqueue_script( 'select2', plugins_url( 'js/select2/select2.min.js', __FILE__ ) );
+	wp_enqueue_script( 'select2', plugins_url( 'js/select2/select2.min.js', __FILE__ ), array('jquery'), '3.2', false );
 	
 	// Embed javascript to make ajax request
-	wp_enqueue_script( 'ajax_get_category', plugins_url( 'js/ajax_get_category.js',__FILE__ ) );
+	wp_enqueue_script( 'ajax_get_category', plugins_url( 'js/ajax_get_category.js',__FILE__ ), array('jquery'), '1.0', false );
 
 	// declare the URL to the file that handles the AJAX request (wp-admin/admin-ajax.php)
 	wp_localize_script( 'ajax_get_category', 'categoryAjax', array( 'ajaxurl' => admin_url( 'admin-ajax.php' ) ) );
